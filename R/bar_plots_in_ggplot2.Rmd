@@ -1,0 +1,96 @@
+---
+title: Barplots in ggplot2
+---
+
+```{r}
+library(ggplot2)
+library(ggthemes)
+data("diamonds")
+```
+
+
+As discussed in scatterplots with ggplot2, most plots begin in ggplot function. The first argument is the data set, the second argument is the mapping. The mapping is usually used in conjucntion with aes (short for aesthetics) function. This gives the main arguments of the plot. Below we create a basic barplot.
+```{r}
+ggplot(diamonds, aes(cut))+
+  geom_bar()
+```
+
+Let's adjust the barwidth
+```{r}
+ggplot(diamonds, aes(cut))+
+  geom_bar(width = 0.5)
+```
+
+To add some more color, let's color the outside of the bars blue and the inisde (fill) green.  To outside of parenthesis tell R to print the object after it is defined.
+```{r}
+(bar1 <- ggplot(diamonds, aes(cut))+
+    geom_bar(width = 0.5, colour = 'blue', fill = 'green'))
+```
+
+Relabel the axes and flip the plot
+```{r}
+bar1+
+  labs(x = 'Cut', y = 'Count')+
+  coord_flip()
+```
+
+
+Let's say you wanted to color each cut differently, rather than all green or all black.
+```{r}
+ggplot(diamonds, aes(cut, fill = cut))+
+  geom_bar(width = 0.5)
+```
+
+In the examples so far, ggplot has produced the count for each different type of cut in the diamonds data set. However, what if you had the counts already and wanted to make a bar plot. For example, let's say that on a math exam there were 10 A's, 7 B's, 6 C's, 5 D's and 2 F's, and you wanted to make a barplot of this. You can use the stat = 'identity' argument in your barplot. This is shown in the code below.
+
+```{r}
+dat <- data.frame(grade = c('A', 'B', 'C', 'D', 'F'), count = c(10, 7, 6, 5, 2), 
+                  description =c('Excellet', 'Good', 'Satisfactory', 'Poor', 'Unsatisfactory'))
+ggplot(dat, aes(x = grade, y = count))+
+  geom_bar(stat = 'identity', width = 0.5)
+```
+
+If your x axis labels are crowded, you can adjust the angle of the text using the element_text function in conjunction with the theme function. Use the arguments hjust = 1 and vjust =1 for horizontal and vertical alignment respectively of the text. For example, in the code below, we use the description of the grade instead of the letter grade, we call theme_calc(), then we adjust the text to appear at 45 degree angle.
+
+
+```{r}
+ggplot(dat, aes(x = description, y = count))+
+  geom_bar(stat = 'identity', width = 0.5)+
+  theme_calc()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+```
+
+Returning to our diamonds data set, you could fill by a different categorical variable. For example let's create a barplot of cut but fill up the bars by the different levels of clarity. This may give us an idea of whether the cut varies by the clarity much.
+```{r}
+ggplot(diamonds, aes(cut, fill = clarity))+
+  geom_bar(width = 0.5)
+```
+
+We can create different barplots for each color by using the function facet_wrap
+```{r}
+ggplot(diamonds, aes(cut, fill = clarity))+
+  geom_bar(width = 0.5)+
+  facet_wrap(~ color)
+```
+
+This would probably look better if we first tried to minimize the number of windows.There are 5 cuts, 8 levels of clarity and 7 colors let's try two do a facet wrap by cut instead wrap by cut, make barplots of the clarity levels with the fill by color.
+```{r}
+(bar2 <- ggplot(diamonds, aes(clarity, fill = color))+
+    geom_bar(width = 0.5)+
+    facet_wrap(~ cut))
+```
+
+Let's add axes label, flip the coordinates
+```{r}
+bar2 +
+  labs(x = 'Cut', y = 'Count')+
+  coord_flip()
+```
+
+You can use the facet grid function to stack all five cuts next to each other.
+```{r}
+bar2 +
+  labs(x = 'Cut', y = 'Count')+
+  coord_flip()+
+  facet_grid(.~cut)
+```
