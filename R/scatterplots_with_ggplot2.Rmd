@@ -1,0 +1,133 @@
+---
+title: Scatterplots with ggplot2
+Author: Justin Strate <justin.j.strate.ctr@mail.mil>
+---
+
+Most plots in ggplot2 are created using the ggplot function. The first argument of ggplot function is the data frame which contains the data you wish to plot. The second argument is the mapping argument. This is usually used in conjunction the aes (short for aesthetics) function. In the aes function you can specify the x and y objects as well as the color. In ggplot2, it is very useful to assign a plot to an object. Then add on additional features as desired. To add an additional feature to a plot simply use the '+' sign. Let's start by assigning a basic scatter plot of the miles per gallon (mpg) versus weight (wt) found in the mtcars data set to an object.
+
+```{r}
+#Load the packages
+library(ggplot2)
+library(ggthemes)
+ 
+#load the data
+data("mtcars")
+#Assign a basic scatter plot to plt1
+plt1 <- ggplot(data = mtcars, aes(x=wt, y=mpg))+
+  geom_point()#adds the points
+ 
+#call it to see the plot
+plt1
+```
+
+The first line simply establishes the frame, while the second line adds the points. This might seem like more work. However, the advantages of using ggplot become clearer as we add new features to the plot. 
+
+Notice that the default points are solid, rather than cirles as in the graphics package. Also, notice the background is gray and has both vertical and horizontal lines running through it. Changing the background is easy with the ggthemes package. ggthemes has lots of themes that are easy to add to your package. Let's add a theme to plt1. I'll be trying out different themes throughout.
+
+```{r}
+#Add a theme
+plt1 + 
+  theme_few() #This theme is really just plain
+```
+
+Let's define a new plot, plt2, that's just like the old plot but add x and y labels. I'll surround the definition of plt2 with parenthese. This will call plt2 so we can see it once it is defined, rather than calling it immediately afterward.
+
+```{r}
+(plt2 <- plt1 +
+  labs(x='Weight',  y='Miles per Gallon')) 
+```
+
+Let's define another new plot that's a modification of plt2 with the regression line. To do this, we can use the stat_smooth function and setting the method argument to 'lm' (for linear model).
+
+```{r}
+plt3 <- plt2 +
+  stat_smooth(method = 'lm', col='green', se=FALSE)
+
+plt3 +
+  theme_stata()
+```
+
+
+Let's add the names of the cars to the beside the appropriate point.
+```{r}
+plt3 +
+  geom_text(aes(label=rownames(mtcars)))+
+  theme_wsj()
+```
+
+What happened to our titles? The wsj theme writes the titles in as blank (see theme_wsj). One solution is to add and axis title using the theme function as follow.
+
+```{r}
+plt3 + 
+  geom_text(aes(label=rownames(mtcars)))+
+  theme_wsj()+
+  theme(axis.title=element_text(size=12))
+```
+
+
+Let's add a vertical and horizontal lines reflecting the mean weight and mpg respectively.
+```{r}
+plt3+
+  geom_text(aes(label=rownames(mtcars)))+
+  geom_hline(aes(yintercept = mean(mtcars$mpg)), 
+      colour="#0000FF", lty=2)+
+  geom_vline(aes(xintercept = mean(mtcars$wt)), 
+      colour="#0000FF", lty=2)+
+  theme_dark()
+```
+
+
+The cars in mtcars have either 4, 6 or 8 cylinders. We can distinguish the points in the scatter plot by the number of cylinders using the colour argument in the ggplot function. However, let's convert cyl into a factor rather than a numeric, using the factor function. Treating cylinders will cause result in a color pattern than increases in brightness as the number of cylinders increases. Such a pattern is more useful for variables that have more than 3 levels.
+```{r}
+ggplot(mtcars, aes(wt,mpg, colour=factor(cyl)))+
+  geom_point()+
+  labs(col='Cylinders')
+```
+
+Now, we have this ugly 'factor(cyl)' label. Let's change all that and define a new object in ggplot2. Additionally, we will make the the objects change shape for different number of gears (either 3, 4 or 5) and make the points get larger for larger quarter mile second time.
+
+```{r}
+(plt5 <- ggplot(mtcars, aes(wt,mpg))+
+  geom_point(aes(wt,mpg, colour=factor(cyl), 
+      shape=factor(gear), size=qsec))+
+  scale_size()+
+  labs(x='Weight', y='Miles per Gallon',col='Cylinders', 
+       size='Quarter Mile Time',shape='Forward gears' ))
+```
+
+
+Let's add the names of the cars to the data set, a title and a theme as well.
+
+```{r}
+(plt6 <- plt5 +
+  geom_text(aes(label=rownames(mtcars)))+
+  stat_smooth(method = 'lm', col='green', se=FALSE))+
+  theme_fivethirtyeight()+
+  theme(axis.title=element_text(size=12))+
+  ggtitle('Weight vs Miles per Gallon')
+```
+
+
+When working with a regression model, it's often useful to visualize residuals by drawing lines from the predicted value to the observed value. We can do this using the geom_segment function, but first we need to fit the model and obtain the predicted values.
+
+
+
+```{r}
+#Fit the model
+fit <- lm(mpg~wt, data = mtcars)
+yhat <- fit$fitted.values
+
+plt6+
+  geom_segment(aes(xend = wt, yend=yhat))
+```
+
+Now, imagine only wanted to do this for the fiat. In other words, we want to draw a vertical line from the predicted mpg for the fiat using our regression model to the observed mpg for the fiat. First, we have to find the index of the fiat. Here, I did this using the which function. The which function takes a logical vector and returns the indices where there is a TRUE. Then, I use the index to subset the wt, mpg and yhat vectors. 
+```{r}
+fiat_idx <- which(rownames(mtcars)=='Fiat 128')
+
+plt6+
+  geom_segment(aes(x = wt[fiat_idx], xend = wt[fiat_idx], y = mpg[fiat_idx], yend=yhat[fiat_idx]))
+```
+
+
+
