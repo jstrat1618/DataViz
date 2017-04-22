@@ -1,0 +1,83 @@
+---
+title: "Boxplots_ggplot2"
+author: "Justin Strate"
+output: html_document
+---
+I would like to cover the basics of boxplots in ggplot2 here. If you would like to use the base R functions see the page on scatterplots in ggplot2. Let's use the iris data set again. If you haven't had a decent introduction to ggplot2 I highly recommend you check out this page which should give you a good introduction to the syntax of ggplot2. Although it covers scatter plots, you'll find that many of the features overlap.
+
+First, let's load the libraries and the data we need.
+
+```{r}
+library(ggplot2)
+library(ggthemes)
+
+data("iris")
+```
+
+We'll create a basic, vertical boxplot of Sepal.Width. Since this is a vertical boxplot of all the flowers' sepal width, we don't need to do anything with the x-axis. So, we will simply set it to 1. Later, we'll change it to something not so trivial.
+
+```{r}
+#A Basic boxplot of Sepal.Width
+(box1 <- ggplot(data = iris, mapping = aes(1, Sepal.Width))+
+          geom_boxplot())
+```
+The x-axis is not only ugly but uninformative; so let's clear the x-axis.
+
+```{r}
+box1 +          
+      theme(axis.title.x=element_blank(),
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank())
+```
+
+Let's make a horizontal boxplot, and add a title and theme. If you want more information on themes check out the page on scatter plots. There you can see a lot more themes and how to overcome some of the problems some themes can introduce.
+
+```{r}
+#Make a horizontal boxplot and add a title and a theme
+box1 + 
+  theme_wsj()+
+  coord_flip()+
+  #now we need to make the y-axis blank
+  theme(axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())+
+  ggtitle('Sepal Width Boxplot')
+```
+
+Now, suppose we want to compare sepal widths for the different species of flower in the data set. It's here where boxplots in ggplot2 are more intuitive than the base R functions.
+
+```{r}
+#Let's make a boxplot for each different species
+(box2 <- ggplot(data = iris, mapping = aes(Species, Sepal.Width))+
+          geom_boxplot())
+```
+
+We can see the points that make up each boxplot using the \code{geom_jitter} function. This function assigns x-coordinates randomly. So if you run it more than once with using something like set.seed you will see different x-coordinates for the points.
+
+```{r}
+box2 +
+  geom_jitter()
+```
+
+Let's make a notch boxplot, and let's give each boxplot a different color. The narrowing of the notch provides information about the medians. If these notches do not overlap this provides statistical evidence against equal medians.
+
+```{r}
+ggplot(data = iris, mapping = aes(Species, Sepal.Width))+
+          geom_boxplot(mapping = aes(fill=Species), notch = TRUE)
+```
+
+We can also make the color of the outliers different. For example, let's change it to red.
+```{r}
+(box3 <- ggplot(data = iris, mapping = aes(Species, Sepal.Width))+
+  geom_boxplot(mapping = aes(fill=Species), notch = TRUE, outlier.colour = 'red'))
+```
+We can incorporate another variable, sepal length. We'll use the the geom_jitter function to call the points. Then we will color them by Sepal.Length.
+
+```{r}
+box3 +
+  geom_jitter(mapping = aes(colour=Sepal.Length))+
+  ggtitle('Sepal Width by Species')+
+  theme_fivethirtyeight()
+```
+
+As you see, the setosa species tends to have lower sepal lengths, despite having longer sepal widths on average.
