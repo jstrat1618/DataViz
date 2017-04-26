@@ -1,0 +1,45 @@
+---
+title: "Pie Charts"
+author: "Justin Strate"
+output: html_document
+---
+Suppose we have have a survey of 50 texans on what Texas' basketball team they prefer. Suppose we 25 say Spurs, 15 say Rockets and 10 say Mavericks. And, we record this data
+in two vectors.
+
+```{r}
+x <- c(25, 15, 10)
+labs  <- c('Spurs', 'Rockets', 'Mavericks')
+ 
+#A basic pie chart
+pie(x, labels = labs, main="Pie Chart of Programming")
+```
+
+Let's say we want the percentage of users in the in the label. We can do this by creating a new label(labs2).
+
+```{r}
+pcts <- paste( round(x/sum(x),3) *100, "%", sep="") #Round to 3 significant digits
+labs2 <- paste(labs, pcts, sep = " ")
+``` 
+
+Let's change these bland color schemes.
+```{r}
+colLabs <- c('green', 'blue', 'yellow')
+
+pie(x, labels = labs2, col=colLabs, main="Pie Chart of Programming")
+```
+
+Personally, I prefer 3d pie charts. You can use the function pie3D in the plotrix library
+to make one.
+
+```{r}
+library(plotrix)
+pie3D(x, labels = labs2, col=colLabs, 
+       main="Pie Chart of Programming")
+```
+
+You can make the slices stick out more using the explode option.
+
+```{r}
+pie3D(x, labels = labs2, col=colLabs,  
+      main="Pie Chart of Programming", explode = 0.1)
+```
