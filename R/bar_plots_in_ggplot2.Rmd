@@ -1,5 +1,5 @@
 ---
-title: Barplots in ggplot2
+title: "Barplots in ggplot2"
 ---
 
 ```{r}
@@ -44,7 +44,7 @@ ggplot(diamonds, aes(cut, fill = cut))+
 In the examples so far, ggplot has produced the count for each different type of cut in the diamonds data set. However, what if you had the counts already and wanted to make a bar plot. For example, let's say that on a math exam there were 10 A's, 7 B's, 6 C's, 5 D's and 2 F's, and you wanted to make a barplot of this. You can use the stat = 'identity' argument in your barplot. This is shown in the code below.
 
 ```{r}
-dat <- data.frame(grade = c('A', 'B', 'C', 'D', 'F'), count = c(10, 7, 6, 5, 2), 
+dat <- data.frame(grade = c('A', 'B', 'C', 'D', 'F'), count = c(10, 13, 6, 5, 2), 
                   description =c('Excellet', 'Good', 'Satisfactory', 'Poor', 'Unsatisfactory'))
 ggplot(dat, aes(x = grade, y = count))+
   geom_bar(stat = 'identity', width = 0.5)
@@ -56,9 +56,38 @@ If your x axis labels are crowded, you can adjust the angle of the text using th
 ```{r}
 ggplot(dat, aes(x = description, y = count))+
   geom_bar(stat = 'identity', width = 0.5)+
-  theme_calc()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))+
+  labs(x = "Grade Category", y = "Count")+
+  theme_calc()
 ```
+
+Sometimes we may want to order our barplot differently. The two above barplots are ordered from left to right in alphabetical order. However, what if we had wanted to order the grades based on the category with the most to least students. We can use the function \code{reorder} to specify the order. The first argument is the variable that is being reordered, in this example description, the second vector specifies the order in which you want to order that vector from lowest to highest.
+
+```{r}
+ggplot(dat, aes(x = reorder(description, count), y = count))+
+  geom_bar(stat = 'identity', width = 0.5)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))+
+  labs(x = "Grade Category", y = "Count")+
+  theme_calc()
+```
+
+This is in ascending order. If we wnated to order in descending order we could use a minus sign on count in the \code{reorder} function.
+```{r}
+ggplot(dat, aes(x = reorder(description, -count), y = count))+
+  geom_bar(stat = 'identity', width = 0.5)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))+
+  labs(x = "Grade Category", y = "Count")+
+  theme_calc()
+```
+We could specify another numeric vector. For example, since \code{dat$description} is listed from Excellent to Unsatisfactory, we could list use the vector \code{1:5}, thereby plotting Excellent first, Good second and so forth.
+```{r}
+ggplot(dat, aes(x = reorder(description, 1:5) , y = count))+
+  geom_bar(stat = 'identity', width = 0.5)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))+
+  labs(x = "Grade Category", y = "Count")+
+  theme_calc()
+```
+
 
 Returning to our diamonds data set, you could fill by a different categorical variable. For example let's create a barplot of cut but fill up the bars by the different levels of clarity. This may give us an idea of whether the cut varies by the clarity much.
 ```{r}
@@ -92,5 +121,6 @@ You can use the facet grid function to stack all five cuts next to each other.
 bar2 +
   labs(x = 'Cut', y = 'Count')+
   coord_flip()+
-  facet_grid(.~cut)
+  facet_grid(.~cut)+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1))
 ```
