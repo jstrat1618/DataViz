@@ -3,7 +3,7 @@ title: "Boxplots_ggplot2"
 author: "Justin Strate"
 output: html_document
 ---
-I would like to cover the basics of boxplots in ggplot2 here. If you would like to use the base R functions see the page on scatterplots in ggplot2. Let's use the iris data set again. If you haven't had a decent introduction to ggplot2 I highly recommend you check out this page which should give you a good introduction to the syntax of ggplot2. Although it covers scatter plots, you'll find that many of the features overlap.
+I would like to cover the basics of boxplots in ggplot2 here. If you would like to use the base R functions see the page on scatterplots in ggplot2. Let's use the iris data set again. If you haven't had a decent introduction to ggplot2 I highly recommend you check out scatterplots first,which should give you a good introduction to the syntax of ggplot2. Although it covers scatter plots, you'll find that many of the features overlap.
 
 First, let's load the libraries and the data we need.
 
